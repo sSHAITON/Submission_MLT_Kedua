@@ -15,9 +15,9 @@
 
 Pada era digital saat ini, ledakan informasi yang tersedia secara online membuat pengguna sering kali kewalahan dalam menemukan konten yang relevan dan sesuai dengan minat mereka. Hal ini sangat terasa dalam industri literatur digital, di mana jutaan buku tersedia melalui platform e-commerce dan perpustakaan digital. Fenomena ini dikenal sebagai "information overload" atau kelebihan informasi, di mana volume data yang besar justru menjadi hambatan bagi pengguna untuk menemukan buku yang benar-benar mereka inginkan.
 
-![book-recommendation-system](https://miro.medium.com/max/1400/1*BcXAhvp6xChQ85B7yYbkXA.png)
+![image](https://github.com/user-attachments/assets/41396bde-5b6c-4161-9efe-e662c6b27b40)
 
-_Gambar 1: Ilustrasi Sistem Rekomendasi Buku_
+_Gambar 1: Buku_
 
 Sistem rekomendasi buku hadir sebagai solusi untuk masalah ini, dengan tujuan utama membantu pengguna menemukan buku yang sesuai dengan preferensi mereka secara efisien. Menurut penelitian oleh [Isinkaye et al. (2015)](https://www.sciencedirect.com/science/article/pii/S1110866515000341), sistem rekomendasi telah menjadi komponen kritis dalam platform e-commerce modern, dengan kemampuan meningkatkan kepuasan pengguna hingga 27% dan meningkatkan pendapatan bisnis hingga 35%.
 
@@ -108,9 +108,10 @@ Dengan mengimplementasikan kedua pendekatan ini, kita dapat membandingkan kinerj
 
 Dataset yang digunakan pada proyek ini adalah dataset [Book-Crossing: User review ratings](https://www.kaggle.com/datasets/ruchi798/bookcrossing-dataset) dari Kaggle, yang berisi informasi tentang buku, pengguna, dan rating yang diberikan oleh pengguna terhadap buku.
 
-![dataset-screenshot](https://storage.googleapis.com/kaggle-datasets-images/138112/320240/d65cc0b7cf49b0e3c2e6ae9e1c970b97/dataset-cover.jpg?t=2019-08-17-11-42-23)
+![image](https://github.com/user-attachments/assets/03d27bfa-67b8-418c-9aee-da978880a90f)
 
-_Gambar 2: Screenshot dari Dataset Book-Crossing pada Kaggle_
+
+_Gambar 2: Dataset_
 
 ### Informasi Dataset
 
@@ -159,63 +160,63 @@ Berikut adalah statistik deskriptif dari dataset:
 | 75%       | 2.087980e+05 | 4.500000e+01 | 8.000000e+00 | 2.001000e+03        |
 | max       | 2.788540e+05 | 9.900000e+01 | 1.000000e+01 | 2.008000e+03        |
 
-#### Analisis Univariat
+#### Univariate Analysis
 
-Dari hasil analisis univariat, ditemukan beberapa insight penting:
+Dari hasil Univariate Analysis, ditemukan beberapa insight penting:
 
-![rating-distribution](https://miro.medium.com/v2/resize:fit:720/format:webp/1*Vko_xr8NfLuF__IUUB7VSg.png)
+![image](https://github.com/user-attachments/assets/0adc7ff0-36fb-4dff-8e04-4f02d3e11b2d)
 
 _Gambar 3: Distribusi Rating pada Dataset_
 
 - **Distribusi Rating**: Mayoritas data adalah interaksi tanpa rating eksplisit (rating 0), menandakan bahwa sebagian besar entri adalah implicit feedback. Hal ini penting untuk diperhatikan karena akan mempengaruhi pendekatan pemodelan, terutama untuk collaborative filtering.
 
-![age-distribution](https://miro.medium.com/v2/resize:fit:1400/1*Qo9KMG2R4nWNsLHkZUjUhQ.png)
+![image](https://github.com/user-attachments/assets/633db6c6-4401-45d8-8103-6261b7e8c5d8)
 
 _Gambar 4: Distribusi Usia Pengguna_
 
 - **Distribusi Usia Pengguna**: Rentang usia pengguna sangat luas (5-99 tahun) dengan konsentrasi terbesar pada kelompok usia 30-40 tahun. Hal ini menunjukkan bahwa platform digunakan oleh berbagai kelompok umur, tetapi mayoritas adalah pembaca dewasa.
 
-![publication-year](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*7SzAksXjGY-1ngfIr-NFiQ.png)
+![image](https://github.com/user-attachments/assets/e561c0d2-ce39-4bf0-b512-2878ba786b48)
 
 _Gambar 5: Distribusi Tahun Publikasi Buku_
 
 - **Distribusi Tahun Publikasi**: Terjadi peningkatan drastis dari tahun 1990-an hingga awal 2000-an, dengan puncak di sekitar tahun 2000. Ini mengindikasikan bahwa dataset lebih banyak berisi buku-buku kontemporer daripada klasik.
 
-![top-authors](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*SbvJJF9SRt8hWHd-2aHVfQ.png)
+![image](https://github.com/user-attachments/assets/d7b0bb2c-00dd-45b8-ab00-196660b095e9)
 
 _Gambar 6: 10 Penulis dengan Jumlah Buku Terbanyak_
 
 - **Distribusi Penulis**: Stephen King merupakan penulis dengan representasi tertinggi (10,053 entri), diikuti oleh beberapa penulis populer lainnya. Distribusi yang tidak merata ini dapat mempengaruhi rekomendasi, terutama untuk content-based filtering.
 
-![language-distribution](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*0q0jm2FHeBXleZhZQJbEoA.png)
+![image](https://github.com/user-attachments/assets/b8cd5696-1ecf-45ff-a57e-71a54c97d19c)
 
 _Gambar 7: Distribusi Bahasa Buku_
 
 - **Distribusi Bahasa**: Bahasa Inggris sangat dominan (618,505 entri), menunjukkan ketidakseimbangan yang ekstrem dalam keragaman bahasa. Hal ini penting untuk dipertimbangkan dalam sistem rekomendasi multi-bahasa.
 
-![country-distribution](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*LrwgDsXYLmCxNDX10ZvJlw.png)
+![image](https://github.com/user-attachments/assets/d8800275-d327-4bfc-8cbc-2ac8a72b446f)
 
 _Gambar 8: 10 Negara dengan Jumlah Pengguna Terbanyak_
 
 - **Distribusi Geografis**: USA sangat dominan (745,840 entri), diikuti oleh Kanada dan Inggris. Ini menunjukkan bias geografis yang kuat dalam dataset, yang perlu dipertimbangkan untuk rekomendasi global.
 
-#### Analisis Multivariat
+#### Multivariate Analysis
 
-Dari hasil analisis multivariat, ditemukan beberapa insight penting:
+Dari hasil Analysis Multivariate, ditemukan beberapa insight penting:
 
-![rating-by-year](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*YbJk6y5x1QX2PxPZsIU-LA.png)
+![image](https://github.com/user-attachments/assets/bbb8bcf7-6351-450c-b503-ac3096005dbc)
 
 _Gambar 9: Distribusi Rating Berdasarkan Tahun Publikasi_
 
 - **Rating vs Tahun Publikasi**: Distribusi rating relatif konsisten antar tahun, menandakan bahwa usia buku tidak signifikan mempengaruhi penilaian pengguna. Ini menunjukkan bahwa pembaca menilai buku berdasarkan kualitas konten, bukan popularitas terkini.
 
-![rating-by-publisher](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*YL-lK8p7NQbK9q64JUYrbA.png)
+![image](https://github.com/user-attachments/assets/b9481993-f3a6-4d6e-b078-caac880210a7)
 
 _Gambar 10: Rata-rata Rating Berdasarkan Penerbit_
 
 - **Rating vs Penerbit**: Terdapat variasi signifikan antar penerbit besar, dengan beberapa penerbit secara konsisten mendapatkan rating lebih tinggi. Hal ini dapat menjadi fitur penting dalam sistem rekomendasi.
 
-![rating-by-author](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*XWQs_J2QmjOKkgMvZYtQ7g.png)
+![image](https://github.com/user-attachments/assets/5c712bcf-183a-4677-8a67-baf34f53ecc5)
 
 _Gambar 11: Distribusi Rating untuk Penulis Teratas_
 
@@ -223,7 +224,7 @@ _Gambar 11: Distribusi Rating untuk Penulis Teratas_
 
 #### Analisis Korelasi
 
-![correlation-matrix](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*xPnwSl9FULsLWWpS40_TXg.png)
+![image](https://github.com/user-attachments/assets/95baf440-80da-4bd3-bd4f-b67ece2daa6d)
 
 _Gambar 12: Matriks Korelasi Antar Variabel Numerik_
 
@@ -254,17 +255,19 @@ Missing value ditangani dengan mengisi nilai default:
 - city, state, dan country diisi dengan 'Unknown'
 
 ```python
-# Melihat kembali kolom dengan missing value
 print("Kolom dengan missing value:")
 print(df.isna().sum()[df.isna().sum() > 0])
 
-# Menangani missing value pada book_author
 df['book_author'] = df['book_author'].fillna('Unknown Author')
 
-# Untuk kolom lokasi, kita dapat mengisinya dengan 'Unknown'
 df['city'] = df['city'].fillna('Unknown')
 df['state'] = df['state'].fillna('Unknown')
 df['country'] = df['country'].fillna('Unknown')
+
+print("\nSetelah penanganan missing value:")
+print(df.isna().sum()[df.isna().sum() > 0])
+
+print(f"\nJumlah duplikasi: {df.duplicated().sum()}")
 ```
 
 **Alasan**: Penanganan missing value penting untuk menghindari error saat pemrosesan data. Untuk book_author, mengisi dengan 'Unknown Author' memungkinkan kita tetap mempertahankan buku tersebut dalam dataset. Untuk data lokasi, karena tidak terlalu berpengaruh pada rekomendasi buku, kita cukup mengisi dengan 'Unknown'.
@@ -290,11 +293,12 @@ Untuk masing-masing pendekatan, dipilih fitur yang relevan:
 - rating
 
 ```python
-# Memilih fitur untuk content-based filtering
-content_features = ['isbn', 'book_title', 'book_author', 'publisher', 'Category', 'Summary', 'Language']
-content_df = df[content_features].drop_duplicates(subset=['isbn'])
+content_features = ['isbn', 'book_title', 'book_author', 'publisher', 'Category', 'Summary']
 
-# Memilih fitur untuk collaborative filtering
+# Filter data untuk menghilangkan buku dengan kategori '9' dan summary '9'
+filtered_content_df = df[~(df['Category'] == '9') & ~(df['Summary'] == '9')]
+content_df = filtered_content_df[content_features].drop_duplicates(subset=['isbn'])
+
 collab_features = ['user_id', 'isbn', 'rating']
 collab_df = df[collab_features]
 ```
@@ -308,14 +312,11 @@ collab_df = df[collab_features]
 - Mengonversi teks ke lowercase untuk standardisasi
 
 ```python
-# Menangani nilai kosong pada fitur teks
 content_df['Summary'] = content_df['Summary'].fillna('')
 content_df['Category'] = content_df['Category'].fillna('')
 
-# Membuat fitur gabungan untuk TF-IDF
 content_df['content'] = content_df['book_title'] + ' ' + content_df['book_author'] + ' ' + content_df['publisher'] + ' ' + content_df['Category'] + ' ' + content_df['Summary']
 
-# Konversi ke lowercase
 content_df['content'] = content_df['content'].str.lower()
 ```
 
@@ -328,22 +329,18 @@ content_df['content'] = content_df['content'].str.lower()
 - Melakukan mapping ID user dan buku ke indeks berurutan untuk efisiensi komputasi
 
 ```python
-# Filter data dengan rating eksplisit (>0)
 collab_df = collab_df[collab_df['rating'] > 0]
 
-# Filter user yang telah memberikan rating minimal 5 buku
 min_user_ratings = 5
 user_counts = collab_df['user_id'].value_counts()
 active_users = user_counts[user_counts >= min_user_ratings].index
 filtered_df = collab_df[collab_df['user_id'].isin(active_users)]
 
-# Filter buku yang telah mendapatkan rating minimal dari 5 user
 min_book_ratings = 5
 book_counts = filtered_df['isbn'].value_counts()
 popular_books = book_counts[book_counts >= min_book_ratings].index
 filtered_df = filtered_df[filtered_df['isbn'].isin(popular_books)]
 
-# Mapping ID ke indeks berurutan
 user_ids = filtered_df['user_id'].unique().tolist()
 isbn_ids = filtered_df['isbn'].unique().tolist()
 user_to_idx = {user: i for i, user in enumerate(user_ids)}
@@ -354,9 +351,6 @@ filtered_df['isbn_idx'] = filtered_df['isbn'].map(isbn_to_idx)
 
 **Alasan**: Untuk collaborative filtering, perlu mengatasi masalah sparsity dengan memfilter user dan buku dengan jumlah interaksi yang cukup. Mapping ID ke indeks berurutan meningkatkan efisiensi komputasi dan memudahkan proses embedding dalam model neural network.
 
-![data-preparation-flow](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*TlUZBnYO1CntDmrTUWxzfQ.png)
-
-_Gambar 13: Alur Proses Data Preparation_
 
 ## Modeling
 
@@ -382,9 +376,6 @@ Content-based filtering merekomendasikan buku berdasarkan kemiripan konten antar
    tfidf_matrix = tfidf.fit_transform(content_df['content'])
    ```
 
-   ![tfidf-matrix](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*_AKaKjbbZ2vbwqJNNXce1A.png)
-
-   _Gambar 14: Visualisasi Representasi TF-IDF Matrix_
 
 2. **Cosine Similarity**
 
@@ -398,57 +389,60 @@ Content-based filtering merekomendasikan buku berdasarkan kemiripan konten antar
        return cosine_similarity(tfidf_matrix[idx:idx+1], tfidf_matrix).flatten()
    ```
 
-   ![cosine-similarity](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*NPY_YXvloYbL5Z8HrGx-QQ.png)
-
-   _Gambar 15: Ilustrasi Cosine Similarity Antar Dokumen_
-
 3. **Fungsi Rekomendasi**
 
    ```python
    def get_content_based_recommendations(isbn, k=10):
-       # Verifikasi ISBN ada dalam dataset
-       if isbn not in indices:
-           print(f"ISBN {isbn} tidak ditemukan dalam indices.")
-           return []
-
-       # Mendapatkan indeks buku referensi
-       idx = indices[isbn]
-
-       # Mengambil vektor TF-IDF buku referensi
-       book_vector = tfidf_matrix[idx:idx+1]
-
-       # Menghitung cosine similarity
-       sim_scores = cosine_similarity(book_vector, tfidf_matrix).flatten()
-
-       # Mendapatkan indeks buku yang paling mirip
-       sim_indices = sim_scores.argsort()[::-1]
-       sim_indices = sim_indices[sim_indices != idx][:k]
-
-       # Mendapatkan ISBN buku rekomendasi
-       recommended_isbn = content_df['isbn'].iloc[sim_indices].tolist()
-
-       # Menyiapkan hasil rekomendasi
-       recommendations = [(rec_isbn, isbn_to_title.get(rec_isbn, "Unknown Title"))
-                         for rec_isbn in recommended_isbn]
-
-       return recommendations
+    try:
+        # Mendapatkan buku referensi dari ISBN
+        reference_book = content_df[content_df['isbn'] == isbn]
+        
+        if reference_book.empty:
+            print(f"ISBN {isbn} tidak ditemukan dalam dataset.")
+            return []
+            
+        # Mendapatkan indeks buku referensi
+        idx = reference_book.index[0]
+        
+        # Menghitung cosine similarity
+        book_vector = tfidf_matrix[idx:idx+1]
+        sim_scores = cosine_similarity(book_vector, tfidf_matrix).flatten()
+        
+        # Membuat DataFrame sementara dengan skor similaritas dan ISBNs
+        temp_df = pd.DataFrame({
+            'isbn': content_df['isbn'],
+            'similarity': sim_scores
+        })
+        
+        # Mengurutkan berdasarkan similaritas (hilangkan buku referensi)
+        temp_df = temp_df[temp_df['isbn'] != isbn].sort_values('similarity', ascending=False).head(k)
+        
+        # Menyiapkan hasil rekomendasi
+        recommendations = []
+        for _, row in temp_df.iterrows():
+            rec_isbn = row['isbn']
+            rec_title = isbn_to_title.get(rec_isbn, "Unknown Title")
+            recommendations.append((rec_isbn, rec_title))
+            
+        return recommendations
+        
+    except Exception as e:
+        print(f"Error dalam get_content_based_recommendations: {e}")
+        return []
    ```
 
 #### Contoh Hasil Rekomendasi
 
-![content-based-recommendation](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*Th9LzKg6KOVPiaMykHGAPQ.png)
 
-_Gambar 16: Contoh Hasil Rekomendasi Content-based Filtering_
+Untuk buku "Our Dumb Century: The Onion Presents 100 Years of Headlines from America's Finest News Source", sistem merekomendasikan buku-buku seperti:
 
-Untuk buku "The Witchfinder (Amos Walker Mystery Series)" dengan genre Mystery/Thriller, sistem merekomendasikan buku-buku dengan genre serupa seperti:
+1. The Onion Field (ISBN: 0440173507)
+2. Dispatches from the Tenth Circle: The Best of the Onion (ISBN: 0609808346)
+3. The Onion's Finest News Reporting, Volume 1 (ISBN: 0609804634)
+4. The Maui Onion Cookbook (ISBN: 0890878021)
+5. The Onion Ad Nauseam: Complete News Archives, Volume 13 (ISBN: 1400047242)
 
-1. "The Big Sleep (Philip Marlowe)" - Mystery/Thriller
-2. "The Lady in the Lake (Philip Marlowe)" - Mystery/Thriller
-3. "Farewell, My Lovely (Philip Marlowe)" - Mystery/Thriller
-4. "The High Window (Philip Marlowe)" - Mystery/Thriller
-5. "The Long Goodbye (Philip Marlowe)" - Mystery/Thriller
-
-Hasil ini menunjukkan bahwa sistem berhasil merekomendasikan buku-buku dengan konten yang serupa berdasarkan genre dan karakteristik lainnya.
+Hasil ini menunjukkan bahwa sistem berhasil merekomendasikan buku-buku dengan konten yang serupa berdasarkan karakteristiknya.
 
 ### 2. Collaborative Filtering
 
@@ -472,9 +466,9 @@ Collaborative filtering merekomendasikan buku berdasarkan pola rating yang diber
 
 2. **Arsitektur Model Neural Network**
 
-   ![neural-network-architecture](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*LXZ_y6N88dBli3MbbwT4uA.png)
+   ![image](https://github.com/user-attachments/assets/d99f4c59-5bf0-4030-8c48-77a9083e9428)
 
-   _Gambar 17: Arsitektur Neural Network untuk Collaborative Filtering_
+   _Gambar 13: Arsitektur Neural Network untuk Collaborative Filtering_
 
    ```python
    import tensorflow as tf
@@ -544,10 +538,6 @@ Collaborative filtering merekomendasikan buku berdasarkan pola rating yang diber
    )
    ```
 
-   ![training-progress](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*CWq3SrOXYjDlBmcRfr6iUA.png)
-
-   _Gambar 18: Grafik Proses Pelatihan Model Collaborative Filtering_
-
 4. **Fungsi Rekomendasi**
 
    ```python
@@ -587,17 +577,14 @@ Collaborative filtering merekomendasikan buku berdasarkan pola rating yang diber
 
 #### Contoh Hasil Rekomendasi
 
-![collaborative-recommendation](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*g5K79c9vM-lbQcKoBjlH_w.png)
-
-_Gambar 19: Contoh Hasil Rekomendasi Collaborative Filtering_
 
 Untuk pengguna dengan ID 238010, sistem merekomendasikan buku-buku berikut dengan prediksi rating tertinggi:
 
-1. "The Hobbit" - Prediksi Rating: 9.54/10
-2. "To Kill a Mockingbird" - Prediksi Rating: 9.48/10
-3. "Pride and Prejudice" - Prediksi Rating: 9.32/10
-4. "The Fellowship of the Ring" - Prediksi Rating: 9.27/10
-5. "Harry Potter and the Sorcerer's Stone" - Prediksi Rating: 9.21/10
+1. Unknown Title (ISBN: 0446611212) 
+2. Change Your Life Without Getting Out of Bed : The Ultimate Nap Book (ISBN: 0684859300) 
+3. Bloody Bones (Anita Blake Vampire Hunter (Paperback)) (ISBN: 0515134465) 
+4. Dubliners (ISBN: 0553213806) 
+5. Don't Let's Go to the Dogs Tonight : An African Childhood (ISBN: 0375758992) 
 
 Hasil ini menunjukkan bahwa sistem berhasil memprediksi buku-buku yang mungkin disukai oleh pengguna berdasarkan pola rating dari pengguna lain dengan preferensi serupa.
 
@@ -609,36 +596,82 @@ Pada bagian ini, kita akan mengevaluasi kinerja kedua pendekatan sistem rekomend
 
 Untuk evaluasi content-based filtering, digunakan metrik presisi yang mengukur kesesuaian rekomendasi dengan preferensi pengguna.
 
-#### Metrik Evaluasi: Precision@K
+#### Metrik Evaluasi: Precision
 
-**Precision@K** mengukur proporsi item yang relevan di antara K rekomendasi teratas.
+Untuk mengevaluasi model Content-based Filtering, kita akan menggunakan metrik Precision. Precision mengukur seberapa relevan rekomendasi yang diberikan oleh sistem.
 
-![precision-formula](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*jh4abR2GbK2SR6VPbcRFEw.png)
+Rumus Precision adalah sebagai berikut:
 
-_Gambar 20: Formula Precision@K_
+$$Precision = \frac{TP}{TP + FP}$$
 
-Formula:
-$$\text{Precision@K} = \frac{\text{Jumlah item yang relevan di antara K rekomendasi}}{\text{K}}$$
+Di mana:
+- TP (True Positive): Jumlah rekomendasi yang relevan
+- FP (False Positive): Jumlah rekomendasi yang tidak relevan
 
-Dalam konteks sistem rekomendasi buku, item relevan didefinisikan sebagai buku yang memiliki kategori atau genre yang sama dengan buku referensi.
+Dalam konteks sistem rekomendasi buku, kita dapat mendefinisikan buku yang relevan sebagai buku yang memiliki karakteristik yang sama dengan buku referensi.
 
 ```python
-def evaluate_content_based(book_isbn, recommendations, k=10):
-    # Mendapatkan kategori dari buku referensi
-    reference_book = content_df[content_df['isbn'] == book_isbn]
-    reference_category = reference_book['Category'].values[0]
+def calculate_comprehensive_precision(reference_book_isbn, recommendations, threshold=0.3):
+    """
+    Menghitung precision dari rekomendasi berdasarkan beberapa fitur konten,
+    bukan hanya kategori.
+    
+    Args:
+        reference_book_isbn (str): ISBN buku referensi
+        recommendations (list): Daftar tuple (isbn, judul) rekomendasi buku
+        threshold (float): Ambang batas kesamaan untuk dianggap relevan
+        
+    Returns:
+        float: Nilai precision
+    """
+    # Mendapatkan detail buku referensi
+    ref_book = content_df[content_df['isbn'] == reference_book_isbn].iloc[0]
+    ref_category = ref_book['Category']
+    ref_author = ref_book['book_author']
+    ref_publisher = ref_book['publisher']
+    
+    # Menghitung jumlah rekomendasi yang relevan berdasarkan kriteria multipel
+    relevant_count = 0
+    relevance_details = []
+    
+    for isbn, _ in recommendations:
+        rec_book = content_df[content_df['isbn'] == isbn].iloc[0]
+        relevance_score = 0.0
+        relevance_factors = []
+        
+        # Kesamaan kategori (bobot 0.4)
+        if rec_book['Category'] == ref_category:
+            relevance_score += 0.4
+            relevance_factors.append('kategori')
+            
+        # Kesamaan penulis (bobot 0.3)
+        if rec_book['book_author'] == ref_author:
+            relevance_score += 0.3
+            relevance_factors.append('penulis')
+            
+        # Kesamaan penerbit (bobot 0.2)
+        if rec_book['publisher'] == ref_publisher:
+            relevance_score += 0.2
+            relevance_factors.append('penerbit')
 
-    # Mendapatkan kategori dari buku yang direkomendasikan
-    recommended_isbns = [rec[0] for rec in recommendations]
-    recommended_books = content_df[content_df['isbn'].isin(recommended_isbns)]
-
-    # Menghitung jumlah buku dengan kategori yang sama
-    relevant_count = sum(recommended_books['Category'] == reference_category)
-
-    # Menghitung precision@k
-    precision = relevant_count / k
-
-    return precision
+        
+        # Tentukan apakah buku relevan berdasarkan threshold
+        is_relevant = relevance_score >= threshold
+        if is_relevant:
+            relevant_count += 1
+            
+        relevance_details.append({
+            'isbn': isbn,
+            'title': rec_book['book_title'],
+            'relevance_score': relevance_score,
+            'relevance_factors': relevance_factors,
+            'is_relevant': is_relevant
+        })
+    
+    # Menghitung precision
+    precision = relevant_count / len(recommendations) if recommendations else 0
+    
+    return precision, relevance_details
 ```
 
 #### Hasil Evaluasi
@@ -661,9 +694,9 @@ Berikut adalah hasil evaluasi untuk beberapa buku referensi:
 
 Rata-rata Precision: **0.47**
 
-![content-based-evaluation](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*4rMRtLfV-jGR8Uv4hckqrg.png)
+![image](https://github.com/user-attachments/assets/4f00e28b-2240-442b-92e6-22a1b25d1f57)
 
-_Gambar 21: Grafik Precision@K untuk Content-based Filtering_
+_Gambar 14: Grafik Precision untuk Content-based Filtering_
 
 Dari hasil evaluasi, terlihat bahwa sistem content-based filtering mampu memberikan rekomendasi dengan presisi yang bervariasi. Beberapa buku referensi seperti "Lady of the Trillium" dan "The Bride Price" menghasilkan precision yang tinggi (0.80), sementara buku lain seperti "The BOOK OF VIRTUES" memiliki precision rendah (0.00). Variasi ini menunjukkan bahwa kualitas rekomendasi sangat bergantung pada karakteristik buku referensi dan ketersediaan buku serupa dalam dataset.
 
@@ -673,22 +706,18 @@ Untuk evaluasi collaborative filtering, digunakan metrik RMSE (Root Mean Squared
 
 #### Metrik Evaluasi: RMSE
 
-**RMSE** mengukur rata-rata kesalahan prediksi model.
+Untuk model Collaborative Filtering, kita menggunakan metrik RMSE (Root Mean Squared Error) untuk mengevaluasi akurasi prediksi rating. RMSE mengukur seberapa jauh perbedaan antara rating yang diprediksi dengan rating sebenarnya.
 
-![rmse-formula](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*vRRMz4-_cBVbT3KYQDDAtA.png)
+Rumus RMSE adalah sebagai berikut:
 
-_Gambar 22: Formula RMSE_
+$$RMSE = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}$$
 
-Formula:
-$$\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}$$
+Di mana:
+- $n$ adalah jumlah prediksi
+- $y_i$ adalah rating sebenarnya
+- $\hat{y}_i$ adalah rating yang diprediksi
 
-Dimana:
-
-- $n$ adalah jumlah sampel
-- $y_i$ adalah nilai rating sebenarnya
-- $\hat{y}_i$ adalah nilai rating yang diprediksi
-
-RMSE lebih sensitif terhadap kesalahan besar karena kuadrat dari error, sehingga lebih cocok untuk evaluasi sistem rekomendasi di mana kesalahan besar harus diberikan penalti lebih besar.
+Berikut adalah nilai RMSE terakhir dari training dan validation:
 
 ```python
 def evaluate_collaborative_filtering(model, X_test, y_test):
@@ -713,9 +742,9 @@ def evaluate_collaborative_filtering(model, X_test, y_test):
 | Validation RMSE | 0.1825 |
 | RMSE (skala asli 0-10)| 1.825 |
 
-![collaborative-evaluation](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*j5dOqCceEWaE9W5LwGD37A.png)
+![image](https://github.com/user-attachments/assets/29ee7031-8e7e-44a8-bf6a-d1a30830c347)
 
-_Gambar 23: Grafik RMSE untuk Training dan Validation Set_
+_Gambar 15: Grafik RMSE untuk Training dan Validation Set_
 
 Nilai RMSE yang relatif rendah (1.825 pada skala 0-10) menunjukkan bahwa model collaborative filtering cukup baik dalam memprediksi rating pengguna terhadap buku. Sebuah RMSE di bawah 2 dianggap baik untuk sistem rekomendasi buku, mengingat variabilitas preferensi pengguna.
 
@@ -723,18 +752,13 @@ Nilai RMSE yang relatif rendah (1.825 pada skala 0-10) menunjukkan bahwa model c
 
 **Tabel 5. Perbandingan Kedua Pendekatan**
 | Aspek | Content-based Filtering | Collaborative Filtering |
-|---------------------|----------------------------------------|-------------------------------------------|
-| Metrik Evaluasi | Precision = 0.47 | RMSE = 1.825 |
-| Kelebihan | Tidak memerlukan data dari pengguna lain | Dapat menemukan pola kompleks |
-| | Dapat merekomendasikan item baru | Serendipity tinggi |
-| | Transparan (dapat dijelaskan) | Personalisasi lebih baik |
-| Kekurangan | Overspecialization | Cold-start problem |
-| | Serendipity rendah | Membutuhkan data rating yang banyak |
-| | Membutuhkan deskripsi konten yang baik | Black box (sulit dijelaskan) |
+|-------|------------------------|-------------------------|
+| Metrik Evaluasi | Precision | RMSE |
+| Hasil Evaluasi | Rata-rata Precision: 0.47 | RMSE: ~0.1825 |
+| Kekuatan | - Dapat merekomendasikan buku baru<br>- Tidak memerlukan data rating dari pengguna lain<br>- Mudah dijelaskan | - Dapat menemukan buku yang tidak terkait dengan konten<br>- Memanfaatkan pola preferensi kolektif<br>- Dapat merekomendasikan buku yang tidak terpikirkan |
+| Kelemahan | - Cenderung merekomendasikan buku yang sangat mirip<br>- Tidak dapat menangkap preferensi pengguna<br>- Bergantung pada kualitas fitur buku | - Masalah cold-start untuk pengguna baru<br>- Membutuhkan data rating yang cukup banyak<br>- Sulit menjelaskan rekomendasi |
+| Skenario Terbaik | Ketika ingin merekomendasikan buku berdasarkan konten dan tidak memiliki data rating yang cukup | Ketika memiliki data rating yang cukup dan ingin merekomendasikan buku berdasarkan preferensi pengguna |
 
-![approaches-comparison](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*J7cCkZSklqLnGP_gozBu3w.png)
-
-_Gambar 24: Perbandingan Pendekatan Content-based dan Collaborative Filtering_
 
 Dari perbandingan di atas, dapat disimpulkan bahwa kedua pendekatan memiliki kelebihan dan kekurangan masing-masing. Content-based filtering lebih cocok untuk mengatasi cold-start problem, sementara collaborative filtering lebih baik dalam memberikan rekomendasi yang tidak terduga namun relevan.
 
@@ -757,9 +781,6 @@ Kedua pendekatan memiliki kelebihan dan kekurangan masing-masing:
   - Kelebihan: Dapat menemukan buku yang tidak terkait dengan konten, memanfaatkan pola preferensi kolektif, dan dapat merekomendasikan buku yang tidak terpikirkan.
   - Kekurangan: Menghadapi masalah cold-start untuk pengguna baru, membutuhkan data rating yang cukup banyak, dan sulit menjelaskan alasan di balik rekomendasi.
 
-![conclusion](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*LR9Ti7FTjKfOMXvDyZPOxQ.png)
-
-_Gambar 25: Ringkasan Perbandingan Model dan Potensi Pengembangan_
 
 Hasil evaluasi menunjukkan:
 
