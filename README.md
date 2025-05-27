@@ -160,6 +160,20 @@ Berikut adalah statistik deskriptif dari dataset:
 | 75%       | 2.087980e+05 | 4.500000e+01 | 8.000000e+00 | 2.001000e+03        |
 | max       | 2.788540e+05 | 9.900000e+01 | 1.000000e+01 | 2.008000e+03        |
 
+#### Missing Value, Duplikasi Data dan Anomali Data
+
+Terdapat beberapa missing value pada dataset, khususnya pada kolom:
+
+- book_author (1 missing value)
+- city (14,103 missing value)
+- state (22,798 missing value)
+- country (35,374 missing value)
+
+Tidak terdapat duplikasi data pada dataset, namun ada anomali pada dua kolom, dimana pada kolom Category dan Summary berisi nilai 9.
+**Buku dengan kategori '9': 406102 dari 1031175 (39.38%)**
+**Buku dengan Summary '9': 398937 dari 1031175 (38.69%)**
+
+
 #### Univariate Analysis
 
 Dari hasil Univariate Analysis, ditemukan beberapa insight penting:
@@ -303,7 +317,7 @@ collab_features = ['user_id', 'isbn', 'rating']
 collab_df = df[collab_features]
 ```
 
-**Alasan**: Pemilihan fitur yang tepat sangat penting untuk efisiensi komputasi dan akurasi model. Untuk content-based filtering, kita memilih fitur yang mendeskripsikan konten buku. Untuk collaborative filtering, kita hanya membutuhkan interaksi antara pengguna dan buku.
+**Alasan**: Pemilihan fitur yang tepat sangat penting untuk efisiensi komputasi dan akurasi model. Untuk content-based filtering, kita memilih fitur yang mendeskripsikan konten buku. Untuk collaborative filtering, kita hanya membutuhkan interaksi antara pengguna dan buku. Disini juga penangan anomali pada kolom Category dan Summary dilakukan, dimana untuk content_df tidak akan menggunakan data yang mememiliki nilai "9".
 
 ### 3. Pembersihan Data untuk Content-Based Filtering
 
