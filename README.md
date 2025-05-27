@@ -792,7 +792,7 @@ Hasil evaluasi menunjukkan:
 
 **Collaborative Filtering**:
 
-- RMSE (skala asli 0-10): ~0.24
+- RMSE (skala asli 0-10): ~0.1285
 - Model collaborative filtering berhasil memprediksi rating dengan akurasi tinggi
 
 Untuk pengembangan selanjutnya, dapat dipertimbangkan beberapa hal berikut:
