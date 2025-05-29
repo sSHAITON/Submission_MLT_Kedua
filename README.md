@@ -110,7 +110,6 @@ Dataset yang digunakan pada proyek ini adalah dataset [Book-Crossing: User revie
 
 ![image](https://github.com/user-attachments/assets/03d27bfa-67b8-418c-9aee-da978880a90f)
 
-
 _Gambar 2: Dataset_
 
 ### Informasi Dataset
@@ -172,7 +171,6 @@ Terdapat beberapa missing value pada dataset, khususnya pada kolom:
 Tidak terdapat duplikasi data pada dataset, namun ada anomali pada dua kolom, dimana pada kolom Category dan Summary berisi nilai 9.
 **Buku dengan kategori '9': 406102 dari 1031175 (39.38%)**
 **Buku dengan Summary '9': 398937 dari 1031175 (38.69%)**
-
 
 #### Univariate Analysis
 
@@ -254,7 +252,7 @@ Secara keseluruhan, matrix korelasi menunjukkan independensi antar variabel nume
 
 Tahap persiapan data sangat penting untuk memastikan data siap digunakan dalam pemodelan. Berikut adalah langkah-langkah yang dilakukan:
 
-### 1. Penanganan Missing Value
+### 1. Menangani Missing Value dan Duplikasi Data
 
 Terdapat beberapa missing value pada dataset, khususnya pada kolom:
 
@@ -263,30 +261,16 @@ Terdapat beberapa missing value pada dataset, khususnya pada kolom:
 - state (22,798 missing value)
 - country (35,374 missing value)
 
-Missing value ditangani dengan mengisi nilai default:
+Langkah penanganan:
 
-- book_author diisi dengan 'Unknown Author'
-- city, state, dan country diisi dengan 'Unknown'
-
-```python
-print("Kolom dengan missing value:")
-print(df.isna().sum()[df.isna().sum() > 0])
-
-df['book_author'] = df['book_author'].fillna('Unknown Author')
-
-df['city'] = df['city'].fillna('Unknown')
-df['state'] = df['state'].fillna('Unknown')
-df['country'] = df['country'].fillna('Unknown')
-
-print("\nSetelah penanganan missing value:")
-print(df.isna().sum()[df.isna().sum() > 0])
-
-print(f"\nJumlah duplikasi: {df.duplicated().sum()}")
-```
+- Missing value pada book_author diisi dengan 'Unknown Author'
+- Missing value pada city, state, dan country diisi dengan 'Unknown'
+- Verifikasi bahwa tidak ada lagi missing value
+- Verifikasi bahwa tidak ada duplikasi data
 
 **Alasan**: Penanganan missing value penting untuk menghindari error saat pemrosesan data. Untuk book_author, mengisi dengan 'Unknown Author' memungkinkan kita tetap mempertahankan buku tersebut dalam dataset. Untuk data lokasi, karena tidak terlalu berpengaruh pada rekomendasi buku, kita cukup mengisi dengan 'Unknown'.
 
-### 2. Pemilihan Fitur
+### 2. Pemilihan dan Seleksi Fitur
 
 Untuk masing-masing pendekatan, dipilih fitur yang relevan:
 
@@ -298,7 +282,6 @@ Untuk masing-masing pendekatan, dipilih fitur yang relevan:
 - publisher
 - Category
 - Summary
-- Language
 
 **Collaborative Filtering**:
 
@@ -306,65 +289,60 @@ Untuk masing-masing pendekatan, dipilih fitur yang relevan:
 - isbn
 - rating
 
-```python
-content_features = ['isbn', 'book_title', 'book_author', 'publisher', 'Category', 'Summary']
+Selain itu, dilakukan filtering untuk menghilangkan buku dengan kategori '9' dan summary '9' yang merupakan anomali data.
 
-# Filter data untuk menghilangkan buku dengan kategori '9' dan summary '9'
-filtered_content_df = df[~(df['Category'] == '9') & ~(df['Summary'] == '9')]
-content_df = filtered_content_df[content_features].drop_duplicates(subset=['isbn'])
-
-collab_features = ['user_id', 'isbn', 'rating']
-collab_df = df[collab_features]
-```
-
-**Alasan**: Pemilihan fitur yang tepat sangat penting untuk efisiensi komputasi dan akurasi model. Untuk content-based filtering, kita memilih fitur yang mendeskripsikan konten buku. Untuk collaborative filtering, kita hanya membutuhkan interaksi antara pengguna dan buku. Disini juga penangan anomali pada kolom Category dan Summary dilakukan, dimana untuk content_df tidak akan menggunakan data yang mememiliki nilai "9".
+**Alasan**: Pemilihan fitur yang tepat sangat penting untuk efisiensi komputasi dan akurasi model. Untuk content-based filtering, kita memilih fitur yang mendeskripsikan konten buku. Untuk collaborative filtering, kita hanya membutuhkan interaksi antara pengguna dan buku.
 
 ### 3. Pembersihan Data untuk Content-Based Filtering
 
-- Menangani nilai kosong pada fitur teks (Summary dan Category)
+- Menangani nilai kosong pada fitur teks (Summary dan Category dengan string kosong '')
 - Membuat fitur gabungan 'content' yang menggabungkan book_title, book_author, publisher, Category, dan Summary
 - Mengonversi teks ke lowercase untuk standardisasi
 
-```python
-content_df['Summary'] = content_df['Summary'].fillna('')
-content_df['Category'] = content_df['Category'].fillna('')
+**Alasan**: Pembersihan data teks penting untuk TF-IDF yang akan digunakan dalam content-based filtering. Dengan menggabungkan semua fitur teks, kita dapat membuat representasi komprehensif dari setiap buku.
 
-content_df['content'] = content_df['book_title'] + ' ' + content_df['book_author'] + ' ' + content_df['publisher'] + ' ' + content_df['Category'] + ' ' + content_df['Summary']
+### 4. TF-IDF Vectorization
 
-content_df['content'] = content_df['content'].str.lower()
-```
+- Reset index dari content_df
+- Membuat series indeks untuk memetakan ISBN ke indeks
+- Menerapkan TF-IDF Vectorizer pada fitur 'content' dengan menghilangkan stop words
+- Menghasilkan matriks TF-IDF yang merepresentasikan setiap buku dalam bentuk vektor
 
-**Alasan**: Pembersihan data teks penting untuk TF-IDF yang akan digunakan dalam content-based filtering. Dengan menggabungkan semua fitur teks, kita dapat membuat representasi komprehensif dari setiap buku. Konversi ke lowercase memastikan konsistensi dalam pemrosesan teks.
+**Alasan**: TF-IDF merupakan teknik penting untuk mengubah data teks menjadi representasi numerik yang dapat digunakan untuk menghitung kemiripan antar buku.
 
-### 4. Pembersihan Data untuk Collaborative Filtering
+### 5. Pembersihan Data untuk Collaborative Filtering
 
-- Memfilter data dengan rating eksplisit (>0)
-- Mengatasi masalah sparsity dengan memfilter user dan buku dengan jumlah interaksi minimal
-- Melakukan mapping ID user dan buku ke indeks berurutan untuk efisiensi komputasi
+- Memfilter data dengan rating eksplisit (>0) untuk collaborative filtering
+- Mengecek distribusi rating setelah filtering
+- Melihat jumlah user, buku, dan interaksi setelah filtering
 
-```python
-collab_df = collab_df[collab_df['rating'] > 0]
+**Alasan**: Untuk collaborative filtering, kita hanya tertarik pada interaksi eksplisit dimana pengguna memberikan rating positif.
 
-min_user_ratings = 5
-user_counts = collab_df['user_id'].value_counts()
-active_users = user_counts[user_counts >= min_user_ratings].index
-filtered_df = collab_df[collab_df['user_id'].isin(active_users)]
+### 6. Filter Data untuk Mengatasi Sparsity
 
-min_book_ratings = 5
-book_counts = filtered_df['isbn'].value_counts()
-popular_books = book_counts[book_counts >= min_book_ratings].index
-filtered_df = filtered_df[filtered_df['isbn'].isin(popular_books)]
+- Menghitung jumlah rating per user dan per buku
+- Memfilter user yang telah memberikan rating minimal 5 buku
+- Memfilter buku yang telah mendapatkan rating minimal dari 5 user
+- Melihat data setelah filtering
 
-user_ids = filtered_df['user_id'].unique().tolist()
-isbn_ids = filtered_df['isbn'].unique().tolist()
-user_to_idx = {user: i for i, user in enumerate(user_ids)}
-isbn_to_idx = {isbn: i for i, isbn in enumerate(isbn_ids)}
-filtered_df['user_idx'] = filtered_df['user_id'].map(user_to_idx)
-filtered_df['isbn_idx'] = filtered_df['isbn'].map(isbn_to_idx)
-```
+**Alasan**: Langkah ini penting untuk mengatasi masalah sparsity yang umum dalam sistem rekomendasi. Dengan memfilter user dan item dengan jumlah interaksi minimal, kita dapat memastikan model memiliki cukup data untuk belajar pola yang bermakna.
 
-**Alasan**: Untuk collaborative filtering, perlu mengatasi masalah sparsity dengan memfilter user dan buku dengan jumlah interaksi yang cukup. Mapping ID ke indeks berurutan meningkatkan efisiensi komputasi dan memudahkan proses embedding dalam model neural network.
+### 7. Mapping ID untuk Collaborative Filtering
 
+- Membuat dictionary untuk mapping user_id ke indeks (user_to_idx)
+- Membuat dictionary untuk mapping isbn ke indeks (isbn_to_idx)
+- Memetakan ID ke indeks berurutan
+
+**Alasan**: Mapping ID ke indeks berurutan meningkatkan efisiensi komputasi dan memudahkan proses embedding dalam model neural network.
+
+### 8. Split Data untuk Collaborative Filtering
+
+- Menyiapkan data untuk modeling (X berisi user_idx dan isbn_idx, y berisi rating)
+- Normalisasi rating ke rentang [0, 1]
+- Membagi data menjadi training dan testing dengan rasio 80:20
+- Mendapatkan jumlah user dan buku untuk parameter model
+
+**Alasan**: Pembagian data membantu dalam mengevaluasi performa model secara objektif dan memastikan model tidak overfitting pada data training. Normalisasi rating penting untuk stabilitas pelatihan model neural network.
 
 ## Modeling
 
@@ -376,77 +354,34 @@ Content-based filtering merekomendasikan buku berdasarkan kemiripan konten antar
 
 #### Algoritma dan Tahapan Implementasi
 
-1. **TF-IDF Vectorizer**
-
-   TF-IDF (Term Frequency-Inverse Document Frequency) digunakan untuk mengekstrak fitur dari konten buku dan mengubahnya menjadi representasi vektor.
-
-   ```python
-   from sklearn.feature_extraction.text import TfidfVectorizer
-
-   # Membuat instance TF-IDF Vectorizer
-   tfidf = TfidfVectorizer(stop_words='english')
-
-   # Fitting dan transformasi data ke dalam representasi TF-IDF
-   tfidf_matrix = tfidf.fit_transform(content_df['content'])
-   ```
-
-
-2. **Cosine Similarity**
+1. **Cosine Similarity**
 
    Cosine similarity digunakan untuk menghitung kemiripan antar buku berdasarkan representasi vektor TF-IDF.
 
    ```python
+   # Menghitung cosine similarity untuk setiap buku
    from sklearn.metrics.pairwise import cosine_similarity
-
-   # Menghitung cosine similarity untuk setiap buku secara on-demand
-   def get_cosine_similarity(idx):
-       return cosine_similarity(tfidf_matrix[idx:idx+1], tfidf_matrix).flatten()
    ```
 
-3. **Fungsi Rekomendasi**
+2. **Fungsi Rekomendasi**
 
    ```python
    def get_content_based_recommendations(isbn, k=10):
-    try:
-        # Mendapatkan buku referensi dari ISBN
-        reference_book = content_df[content_df['isbn'] == isbn]
-        
-        if reference_book.empty:
-            print(f"ISBN {isbn} tidak ditemukan dalam dataset.")
-            return []
-            
-        # Mendapatkan indeks buku referensi
-        idx = reference_book.index[0]
-        
-        # Menghitung cosine similarity
-        book_vector = tfidf_matrix[idx:idx+1]
-        sim_scores = cosine_similarity(book_vector, tfidf_matrix).flatten()
-        
-        # Membuat DataFrame sementara dengan skor similaritas dan ISBNs
-        temp_df = pd.DataFrame({
-            'isbn': content_df['isbn'],
-            'similarity': sim_scores
-        })
-        
-        # Mengurutkan berdasarkan similaritas (hilangkan buku referensi)
-        temp_df = temp_df[temp_df['isbn'] != isbn].sort_values('similarity', ascending=False).head(k)
-        
-        # Menyiapkan hasil rekomendasi
-        recommendations = []
-        for _, row in temp_df.iterrows():
-            rec_isbn = row['isbn']
-            rec_title = isbn_to_title.get(rec_isbn, "Unknown Title")
-            recommendations.append((rec_isbn, rec_title))
-            
-        return recommendations
-        
-    except Exception as e:
-        print(f"Error dalam get_content_based_recommendations: {e}")
-        return []
+       # Mendapatkan indeks buku referensi
+       idx = content_df[content_df['isbn'] == isbn].index[0]
+
+       # Menghitung similarity dengan semua buku
+       sim_scores = cosine_similarity(tfidf_matrix[idx:idx+1], tfidf_matrix).flatten()
+
+       # Mengurutkan berdasarkan similarity dan ambil k rekomendasi teratas
+       temp_df = pd.DataFrame({'isbn': content_df['isbn'], 'similarity': sim_scores})
+       temp_df = temp_df[temp_df['isbn'] != isbn].sort_values('similarity', ascending=False).head(k)
+
+       return [(row['isbn'], isbn_to_title.get(row['isbn'], "Unknown Title"))
+               for _, row in temp_df.iterrows()]
    ```
 
 #### Contoh Hasil Rekomendasi
-
 
 Untuk buku "Our Dumb Century: The Onion Presents 100 Years of Headlines from America's Finest News Source", sistem merekomendasikan buku-buku seperti:
 
@@ -464,143 +399,73 @@ Collaborative filtering merekomendasikan buku berdasarkan pola rating yang diber
 
 #### Algoritma dan Tahapan Implementasi
 
-1. **Persiapan Data untuk Model**
-
-   ```python
-   # Menyiapkan data untuk modeling
-   X = filtered_df[['user_idx', 'isbn_idx']].values
-   y = filtered_df['rating'].values
-
-   # Normalisasi rating ke rentang [0, 1]
-   y = y / 10.0
-
-   # Membagi data menjadi training dan testing
-   X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-   ```
-
-2. **Arsitektur Model Neural Network**
+1. **Arsitektur Model Neural Network**
 
    ![image](https://github.com/user-attachments/assets/d99f4c59-5bf0-4030-8c48-77a9083e9428)
 
    _Gambar 13: Arsitektur Neural Network untuk Collaborative Filtering_
 
    ```python
-   import tensorflow as tf
-   from tensorflow import keras
-   from tensorflow.keras import layers
-
-   # Menentukan dimensi embedding
-   embedding_dim = 50;
-
-   # Membangun model
    def create_model():
        # Input untuk user dan item
        user_input = keras.Input(shape=(1,), name='user_input')
        book_input = keras.Input(shape=(1,), name='book_input')
 
        # Embedding layer untuk user dan item
-       user_embedding = layers.Embedding(num_users, embedding_dim, name='user_embedding')(user_input)
-       book_embedding = layers.Embedding(num_books, embedding_dim, name='book_embedding')(book_input)
-
-       # Flatten embedding
-       user_vector = layers.Flatten()(user_embedding)
-       book_vector = layers.Flatten()(book_embedding)
+       user_embedding = layers.Embedding(num_users, embedding_dim)(user_input)
+       book_embedding = layers.Embedding(num_books, embedding_dim)(book_input)
 
        # Dot product antara user dan item embedding
-       dot_product = layers.Dot(axes=1)([user_vector, book_vector])
-
-       # Layer dense tambahan untuk meningkatkan kapasitas model
-       x = layers.Dense(128, activation='relu')(dot_product)
-       x = layers.Dense(64, activation='relu')(x)
-       x = layers.Dense(32, activation='relu')(x)
+       dot_product = layers.Dot(axes=1)([layers.Flatten()(user_embedding),
+                                         layers.Flatten()(book_embedding)])
 
        # Output layer
-       output = layers.Dense(1, activation='sigmoid')(x)
+       output = layers.Dense(1, activation='sigmoid')(dot_product)
 
-       # Mendefinisikan model
+       # Model dan kompilasi
        model = keras.Model(inputs=[user_input, book_input], outputs=output)
-
-       # Kompilasi model
-       model.compile(
-           optimizer=keras.optimizers.Adam(learning_rate=0.001),
-           loss='mean_squared_error',
-           metrics=[keras.metrics.RootMeanSquaredError()]
-       )
+       model.compile(optimizer='adam', loss='mean_squared_error',
+                    metrics=[keras.metrics.RootMeanSquaredError()])
 
        return model
    ```
 
-3. **Pelatihan Model**
+2. **Pelatihan Model**
 
    ```python
-   # Early stopping untuk menghindari overfitting
+   # Melatih model dengan early stopping
    early_stopping = keras.callbacks.EarlyStopping(
        monitor='val_loss',
        patience=5,
        restore_best_weights=True
    )
 
-   # Melatih model
    history = model.fit(
-       [X_train[:, 0], X_train[:, 1]],  # user_idx, isbn_idx
+       [X_train[:, 0], X_train[:, 1]],
        y_train,
        epochs=20,
        batch_size=64,
        validation_split=0.2,
-       callbacks=[early_stopping],
-       verbose=1
+       callbacks=[early_stopping]
    )
-   ```
-
-4. **Fungsi Rekomendasi**
-
-   ```python
-   def get_collaborative_recommendations(user_id, model, isbn_to_idx, user_to_idx, isbn_to_title, k=10):
-       try:
-           # Mendapatkan indeks user
-           user_idx = user_to_idx[user_id]
-
-           # Mendapatkan semua buku dalam dataset
-           all_books = list(isbn_to_idx.keys())
-
-           # Membuat data untuk prediksi
-           user_book_array = np.array([[user_idx, isbn_to_idx[isbn]] for isbn in all_books])
-
-           # Memprediksi rating untuk semua kombinasi user-book
-           predictions = model.predict([user_book_array[:, 0], user_book_array[:, 1]], verbose=0).flatten() * 10
-
-           # Menggabungkan hasil prediksi dengan ISBN buku
-           book_predictions = list(zip(all_books, predictions))
-
-           # Mengurutkan berdasarkan prediksi rating tertinggi
-           book_predictions = sorted(book_predictions, key=lambda x: x[1], reverse=True)
-
-           # Mendapatkan k rekomendasi teratas
-           top_recommendations = book_predictions[:k]
-
-           # Menyiapkan hasil rekomendasi dengan ISBN, judul, dan prediksi rating
-           recommendations = [(isbn, isbn_to_title.get(isbn, "Unknown Title"), rating)
-                              for isbn, rating in top_recommendations]
-
-           return recommendations
-
-       except KeyError:
-           print(f"User ID {user_id} tidak ditemukan dalam dataset.")
-           return []
    ```
 
 #### Contoh Hasil Rekomendasi
 
+Untuk pengguna dengan ID 154137, sistem merekomendasikan buku-buku berikut dengan prediksi rating tertinggi:
 
-Untuk pengguna dengan ID 238010, sistem merekomendasikan buku-buku berikut dengan prediksi rating tertinggi:
+Rekomendasi Buku Berdasarkan Collaborative Filtering:
 
-1. Unknown Title (ISBN: 0446611212) 
-2. Change Your Life Without Getting Out of Bed : The Ultimate Nap Book (ISBN: 0684859300) 
-3. Bloody Bones (Anita Blake Vampire Hunter (Paperback)) (ISBN: 0515134465) 
-4. Dubliners (ISBN: 0553213806) 
-5. Don't Let's Go to the Dogs Tonight : An African Childhood (ISBN: 0375758992) 
-
-Hasil ini menunjukkan bahwa sistem berhasil memprediksi buku-buku yang mungkin disukai oleh pengguna berdasarkan pola rating dari pengguna lain dengan preferensi serupa.
+1. Searching for David's Heart: A Christmas Story (ISBN: 0590306731) - Prediksi Rating: 7.84
+2. Homicidal Psycho Jungle Cat: A Calvin and Hobbes Collection (ISBN: 0836217691)
+3. A Walk to Remember (ISBN: 0446608955)
+4. Summer Sisters (ISBN: 0385324057)
+5. The Shipping News : A Novel (ISBN: 0743225422)
+6. Where or When  : A Novel (ISBN: 0156006529)
+7. Unknown Title (ISBN: 0446605239)
+8. The Stone Monkey (Lincoln Rhyme Novels (Paperback)) (ISBN: 0743437802)
+9. A Kitchen Witch's Cookbook (ISBN: 1567187072)
+10. Unknown Title (ISBN: 074343627X)
 
 ## Evaluation
 
@@ -619,6 +484,7 @@ Rumus Precision adalah sebagai berikut:
 $$Precision = \frac{TP}{TP + FP}$$
 
 Di mana:
+
 - TP (True Positive): Jumlah rekomendasi yang relevan
 - FP (False Positive): Jumlah rekomendasi yang tidak relevan
 
@@ -629,51 +495,45 @@ def calculate_comprehensive_precision(reference_book_isbn, recommendations, thre
     """
     Menghitung precision dari rekomendasi berdasarkan beberapa fitur konten,
     bukan hanya kategori.
-    
+
     Args:
         reference_book_isbn (str): ISBN buku referensi
         recommendations (list): Daftar tuple (isbn, judul) rekomendasi buku
         threshold (float): Ambang batas kesamaan untuk dianggap relevan
-        
+
     Returns:
         float: Nilai precision
     """
-    # Mendapatkan detail buku referensi
-    ref_book = content_df[content_df['isbn'] == reference_book_isbn].iloc[0]
-    ref_category = ref_book['Category']
-    ref_author = ref_book['book_author']
-    ref_publisher = ref_book['publisher']
-    
+
     # Menghitung jumlah rekomendasi yang relevan berdasarkan kriteria multipel
     relevant_count = 0
     relevance_details = []
-    
+
     for isbn, _ in recommendations:
         rec_book = content_df[content_df['isbn'] == isbn].iloc[0]
         relevance_score = 0.0
         relevance_factors = []
-        
+
         # Kesamaan kategori (bobot 0.4)
         if rec_book['Category'] == ref_category:
             relevance_score += 0.4
             relevance_factors.append('kategori')
-            
+
         # Kesamaan penulis (bobot 0.3)
         if rec_book['book_author'] == ref_author:
             relevance_score += 0.3
             relevance_factors.append('penulis')
-            
+
         # Kesamaan penerbit (bobot 0.2)
         if rec_book['publisher'] == ref_publisher:
             relevance_score += 0.2
             relevance_factors.append('penerbit')
 
-        
         # Tentukan apakah buku relevan berdasarkan threshold
         is_relevant = relevance_score >= threshold
         if is_relevant:
             relevant_count += 1
-            
+
         relevance_details.append({
             'isbn': isbn,
             'title': rec_book['book_title'],
@@ -681,10 +541,10 @@ def calculate_comprehensive_precision(reference_book_isbn, recommendations, thre
             'relevance_factors': relevance_factors,
             'is_relevant': is_relevant
         })
-    
+
     # Menghitung precision
     precision = relevant_count / len(recommendations) if recommendations else 0
-    
+
     return precision, relevance_details
 ```
 
@@ -695,18 +555,18 @@ Berikut adalah hasil evaluasi untuk beberapa buku referensi:
 **Tabel 3. Hasil Evaluasi Content-based Filtering**
 | Judul Buku Referensi | Precision |
 |----------------------------------------|-------------|
-| Revival's Golden Key with Kitk Cameron | 0.40 |
-| Lady of the Trillium | 0.80 |
-| Cheyenne Summer | 0.70 |
-| The Dogfather: A Dog Lover's Mystery | 0.80 |
-| The BOOK OF VIRTUES | 0.00 |
-| The Bride Price | 0.80 |
-| Tainted Blood | 0.60 |
-| A School Teacher in Old Alaska | 0.10 |
-| Nurturing the Unborn Child | 0.10 |
-| The Sea Came in at Midnight | 0.40 |
+| Catfish: My Life in Baseball | 0.50 |
+| Multimedia madness | 0.00 |
+| Dogs for Dummies | 0.50 |
+| Great People of the Bible and How They Lived | 0.40 |
+| Dilly's Big Sister Diary | 0.10 |
+| Dicey's Song | 1.00 |
+| "Taylor's Pocket Guide to Herbs and Edible Flowers" | 0.10 |
+| Land of the Minotaurs (Dragonlance Lost Histories, Vol. 4) | 1.00 |
+| Heirloom Gardens: Simple Secrets for Old-Fashioned Flowers and Vegetables (Garden Style Books) | 0.70 |
+| Alaska: Saga of a Bold Land: From Russian Fur Traders to the Gold Rush, Extraordinary Railroads, World War II, the Oil Boom, and the Fight Over ANWR | 0.90 |
 
-Rata-rata Precision: **0.47**
+Rata-rata Precision: **0.52**
 
 ![image](https://github.com/user-attachments/assets/4f00e28b-2240-442b-92e6-22a1b25d1f57)
 
@@ -727,6 +587,7 @@ Rumus RMSE adalah sebagai berikut:
 $$RMSE = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}$$
 
 Di mana:
+
 - $n$ adalah jumlah prediksi
 - $y_i$ adalah rating sebenarnya
 - $\hat{y}_i$ adalah rating yang diprediksi
@@ -752,15 +613,15 @@ def evaluate_collaborative_filtering(model, X_test, y_test):
 **Tabel 4. Hasil Evaluasi Collaborative Filtering**
 | Metrik | Nilai |
 |-----------------------|---------|
-| Training RMSE | 0.1825 |
-| Validation RMSE | 0.1825 |
-| RMSE (skala asli 0-10)| 1.825 |
+| Training RMSE | 0.0466 |
+| Validation RMSE | 0.1818 |
+| RMSE (skala asli 0-10)| 1.792 |
 
 ![image](https://github.com/user-attachments/assets/29ee7031-8e7e-44a8-bf6a-d1a30830c347)
 
 _Gambar 15: Grafik RMSE untuk Training dan Validation Set_
 
-Nilai RMSE yang relatif rendah (1.825 pada skala 0-10) menunjukkan bahwa model collaborative filtering cukup baik dalam memprediksi rating pengguna terhadap buku. Sebuah RMSE di bawah 2 dianggap baik untuk sistem rekomendasi buku, mengingat variabilitas preferensi pengguna.
+Nilai RMSE yang relatif rendah (1.792 pada skala 0-10) menunjukkan bahwa model collaborative filtering cukup baik dalam memprediksi rating pengguna terhadap buku. Sebuah RMSE di bawah 2 dianggap baik untuk sistem rekomendasi buku, mengingat variabilitas preferensi pengguna.
 
 ### Perbandingan Pendekatan
 
@@ -768,11 +629,10 @@ Nilai RMSE yang relatif rendah (1.825 pada skala 0-10) menunjukkan bahwa model c
 | Aspek | Content-based Filtering | Collaborative Filtering |
 |-------|------------------------|-------------------------|
 | Metrik Evaluasi | Precision | RMSE |
-| Hasil Evaluasi | Rata-rata Precision: 0.47 | RMSE: ~0.1825 |
+| Hasil Evaluasi | Rata-rata Precision: 0.52 | RMSE: ~0.1818 |
 | Kekuatan | - Dapat merekomendasikan buku baru<br>- Tidak memerlukan data rating dari pengguna lain<br>- Mudah dijelaskan | - Dapat menemukan buku yang tidak terkait dengan konten<br>- Memanfaatkan pola preferensi kolektif<br>- Dapat merekomendasikan buku yang tidak terpikirkan |
 | Kelemahan | - Cenderung merekomendasikan buku yang sangat mirip<br>- Tidak dapat menangkap preferensi pengguna<br>- Bergantung pada kualitas fitur buku | - Masalah cold-start untuk pengguna baru<br>- Membutuhkan data rating yang cukup banyak<br>- Sulit menjelaskan rekomendasi |
 | Skenario Terbaik | Ketika ingin merekomendasikan buku berdasarkan konten dan tidak memiliki data rating yang cukup | Ketika memiliki data rating yang cukup dan ingin merekomendasikan buku berdasarkan preferensi pengguna |
-
 
 Dari perbandingan di atas, dapat disimpulkan bahwa kedua pendekatan memiliki kelebihan dan kekurangan masing-masing. Content-based filtering lebih cocok untuk mengatasi cold-start problem, sementara collaborative filtering lebih baik dalam memberikan rekomendasi yang tidak terduga namun relevan.
 
@@ -795,18 +655,17 @@ Kedua pendekatan memiliki kelebihan dan kekurangan masing-masing:
   - Kelebihan: Dapat menemukan buku yang tidak terkait dengan konten, memanfaatkan pola preferensi kolektif, dan dapat merekomendasikan buku yang tidak terpikirkan.
   - Kekurangan: Menghadapi masalah cold-start untuk pengguna baru, membutuhkan data rating yang cukup banyak, dan sulit menjelaskan alasan di balik rekomendasi.
 
-
 Hasil evaluasi menunjukkan:
 
 **Content-based Filtering**:
 
-- Rata-rata precision: 0.47
+- Rata-rata precision: 0.42
 - Beberapa buku memiliki precision yang sangat tinggi (0.80), sementara yang lain memiliki precision yang lebih rendah (0.00-0.40)
 - Model content-based filtering efektif untuk merekomendasikan buku dengan karakteristik serupa
 
 **Collaborative Filtering**:
 
-- RMSE (skala asli 0-10): ~0.1285
+- RMSE (skala asli 0-10): ~1.792
 - Model collaborative filtering berhasil memprediksi rating dengan akurasi tinggi
 
 Untuk pengembangan selanjutnya, dapat dipertimbangkan beberapa hal berikut:
