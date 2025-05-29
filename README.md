@@ -390,6 +390,11 @@ Untuk buku "Our Dumb Century: The Onion Presents 100 Years of Headlines from Ame
 3. The Onion's Finest News Reporting, Volume 1 (ISBN: 0609804634)
 4. The Maui Onion Cookbook (ISBN: 0890878021)
 5. The Onion Ad Nauseam: Complete News Archives, Volume 13 (ISBN: 1400047242)
+6. The Onion Ad Nauseam: Complete News Archives Volume 14 (ISBN: 140004961X)
+7. Jay Leno's Headlines: Book I, II, III : Real but Ridiculous Headlines from America's Newspapers (ISBN: 0517082381)
+8. Onion John (Apollo Editions) (ISBN: 0064401448)
+9. The News About the News: American Journalism in Peril (ISBN: 0375408746)
+10. Beyond News of the Weird (ISBN: 0452267161)
 
 Hasil ini menunjukkan bahwa sistem berhasil merekomendasikan buku-buku dengan konten yang serupa berdasarkan karakteristiknya.
 
@@ -456,7 +461,7 @@ Untuk pengguna dengan ID 154137, sistem merekomendasikan buku-buku berikut denga
 
 Rekomendasi Buku Berdasarkan Collaborative Filtering:
 
-1. Searching for David's Heart: A Christmas Story (ISBN: 0590306731) - Prediksi Rating: 7.84
+1. Searching for David's Heart: A Christmas Story (ISBN: 0590306731)
 2. Homicidal Psycho Jungle Cat: A Calvin and Hobbes Collection (ISBN: 0836217691)
 3. A Walk to Remember (ISBN: 0446608955)
 4. Summer Sisters (ISBN: 0385324057)
@@ -568,7 +573,7 @@ Berikut adalah hasil evaluasi untuk beberapa buku referensi:
 
 Rata-rata Precision: **0.52**
 
-![image](https://github.com/user-attachments/assets/4f00e28b-2240-442b-92e6-22a1b25d1f57)
+![image](https://github.com/user-attachments/assets/10bd22c7-664c-424e-ac74-4d1345d9fd45)
 
 _Gambar 14: Grafik Precision untuk Content-based Filtering_
 
@@ -617,7 +622,7 @@ def evaluate_collaborative_filtering(model, X_test, y_test):
 | Validation RMSE | 0.1818 |
 | RMSE (skala asli 0-10)| 1.792 |
 
-![image](https://github.com/user-attachments/assets/29ee7031-8e7e-44a8-bf6a-d1a30830c347)
+![image](https://github.com/user-attachments/assets/fc8e0f4a-fcf0-4071-8c00-d340cada2855)
 
 _Gambar 15: Grafik RMSE untuk Training dan Validation Set_
 
@@ -659,7 +664,7 @@ Hasil evaluasi menunjukkan:
 
 **Content-based Filtering**:
 
-- Rata-rata precision: 0.42
+- Rata-rata precision: 0.52
 - Beberapa buku memiliki precision yang sangat tinggi (0.80), sementara yang lain memiliki precision yang lebih rendah (0.00-0.40)
 - Model content-based filtering efektif untuk merekomendasikan buku dengan karakteristik serupa
 
